@@ -5,175 +5,103 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Leebox</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:sans-serif;background:#0f0f13;color:#e8e8f0;padding:16px}
-.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
-.logo{font-size:22px;font-weight:700;color:#7c6bff}
-.add-btn{background:#7c6bff;color:#fff;border:none;border-radius:10px;padding:9px 18px;font-size:14px;font-weight:700}
-.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
-.card{background:#1a1a23;border-radius:14px;padding:14px;border:1px solid #2e2e3e}
-.total{grid-column:1/-1;border-color:#7c6bff}
-.label{font-size:11px;color:#888;margin-bottom:4px}
-.val{font-size:24px;font-weight:700}
-.chips{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
-.chip{padding:6px 14px;border-radius:20px;font-size:12px;border:1px solid #2e2e3e;background:#1a1a23;color:#888;font-family:sans-serif}
-.chip.on{background:#7c6bff;border-color:#7c6bff;color:#fff}
-input,select{width:100%;background:#0f0f13;border:1px solid #2e2e3e;border-radius:10px;padding:10px 14px;color:#e8e8f0;font-size:15px;font-family:sans-serif;outline:none;margin-bottom:12px}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:99}
-.drawer{position:fixed;bottom:0;left:0;right:0;background:#1a1a23;border-radius:20px 20px 0 0;padding:24px 20px 40px;z-index:100;display:none}
-.btns{display:flex;gap:10px;margin-top:8px}
-.cancel{flex:1;padding:12px;border-radius:10px;border:1px solid #2e2e3e;background:transparent;color:#888;font-family:sans-serif;font-size:15px}
-.save{flex:2;padding:12px;border-radius:10px;border:none;background:#7c6bff;color:#fff;font-family:sans-serif;font-size:15px;font-weight:700}
-.del{width:100%;padding:12px;border-radius:10px;border:1px solid #f44;background:transparent;color:#f44;font-family:sans-serif;font-size:14px;margin-top:8px;display:none}
-.th{display:grid;grid-template-columns:70px 55px 75px 1fr;gap:8px;padding:8px 12px;font-size:11px;color:#888;border-bottom:1px solid #2e2e3e;margin-bottom:4px}
-.ri{display:grid;grid-template-columns:70px 55px 75px 1fr;gap:8px;padding:12px;background:#1a1a23;border-radius:10px;border:1px solid #2e2e3e;font-size:13px;margin-bottom:4px;align-items:center}
-.empty{text-align:center;padding:40px;color:#888}
+body{font-family:sans-serif;background:#0f0f13;color:#e8e8f0;padding:16px;margin:0}
+h1{color:#7c6bff;margin-bottom:16px}
+.card{background:#1a1a23;border-radius:12px;padding:14px;border:1px solid #2e2e3e;margin-bottom:10px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.lbl{font-size:11px;color:#888;margin-bottom:4px}
+.big{font-size:26px;font-weight:700}
+.form{background:#1a1a23;border-radius:12px;padding:16px;border:1px solid #7c6bff;margin-bottom:16px}
+.form h3{margin-bottom:12px;color:#7c6bff}
+label{font-size:12px;color:#888;display:block;margin-bottom:4px;margin-top:10px}
+input,select{width:100%;background:#0f0f13;border:1px solid #2e2e3e;border-radius:8px;padding:10px;color:#e8e8f0;font-size:15px;font-family:sans-serif;box-sizing:border-box}
+.btn{display:block;width:100%;padding:13px;border-radius:10px;border:none;background:#7c6bff;color:#fff;font-size:16px;font-weight:700;font-family:sans-serif;margin-top:14px;cursor:pointer}
+.row{display:grid;grid-template-columns:70px 55px 80px 1fr 30px;gap:6px;padding:10px 12px;background:#1a1a23;border-radius:10px;border:1px solid #2e2e3e;font-size:13px;align-items:center;margin-bottom:4px}
+.hrow{display:grid;grid-template-columns:70px 55px 80px 1fr 30px;gap:6px;padding:6px 12px;font-size:11px;color:#888;margin-bottom:4px}
+.x{background:none;border:none;color:#f44;font-size:16px;cursor:pointer;padding:0}
 </style>
 </head>
 <body>
-<div class="header">
-  <div class="logo">Leebox</div>
-  <button class="add-btn" id="addBtn">＋ 新增</button>
+<h1>Leebox</h1>
+
+<div class="form">
+<h3>＋ 新增記錄</h3>
+<label>日期</label>
+<input type="date" id="idate">
+<label>類別</label>
+<select id="icat">
+<option value="網路">網路</option>
+<option value="實體">實體</option>
+<option value="東區">東區</option>
+</select>
+<label>金額</label>
+<input type="number" id="iamt" placeholder="0">
+<label>備註（選填）</label>
+<input type="text" id="inote" placeholder="">
+<button class="btn" id="savebtn">儲存記錄</button>
 </div>
-<div class="stats">
-  <div class="card total"><div class="label">總銷售</div><div class="val" style="color:#7c6bff" id="st">$0</div></div>
-  <div class="card"><div class="label">網路</div><div class="val" style="color:#6bffc8" id="so">$0</div></div>
-  <div class="card"><div class="label">實體</div><div class="val" style="color:#ff9f6b" id="ss">$0</div></div>
-  <div class="card"><div class="label">東區</div><div class="val" style="color:#ff6b9d" id="se">$0</div></div>
+
+<div class="card" style="border-color:#7c6bff;margin-bottom:10px">
+<div class="lbl">總銷售</div>
+<div class="big" style="color:#7c6bff" id="st">$0</div>
 </div>
-<div class="chips" id="mc"></div>
-<div class="chips" id="cc">
-  <button class="chip on" data-c="全部">全部</button>
-  <button class="chip" data-c="網路">網路</button>
-  <button class="chip" data-c="實體">實體</button>
-  <button class="chip" data-c="東區">東區</button>
+<div class="grid2">
+<div class="card"><div class="lbl">網路</div><div class="big" style="color:#6bffc8" id="so">$0</div></div>
+<div class="card"><div class="lbl">實體</div><div class="big" style="color:#ff9f6b" id="ss">$0</div></div>
+<div class="card"><div class="lbl">東區</div><div class="big" style="color:#ff6b9d" id="se">$0</div></div>
 </div>
-<input type="text" id="sq" placeholder="🔍 搜尋名稱...">
-<div style="font-size:12px;color:#888;margin-bottom:8px" id="rc">0 筆記錄</div>
-<div class="th"><span>日期</span><span>類別</span><span>金額</span><span>備註</span></div>
-<div id="rl"></div>
-<div class="overlay" id="ov"></div>
-<div class="drawer" id="dw">
-  <div style="font-size:18px;font-weight:700;margin-bottom:16px" id="dt">新增記錄</div>
-  <div class="row">
-    <div><label style="font-size:12px;color:#888;display:block;margin-bottom:4px">日期</label><input type="date" id="id"></div>
-    <div><label style="font-size:12px;color:#888;display:block;margin-bottom:4px">類別</label><select id="ic"><option>網路</option><option>實體</option><option>東區</option></select></div>
-  </div>
-  <label style="font-size:12px;color:#888;display:block;margin-bottom:4px">金額</label>
-  <input type="number" id="ia" placeholder="0">
-  <label style="font-size:12px;color:#888;display:block;margin-bottom:4px">備註</label>
-  <input type="text" id="in" placeholder="選填">
-  <div class="btns">
-    <button class="cancel" id="cancelBtn">取消</button>
-    <button class="save" id="saveBtn">儲存</button>
-  </div>
-  <button class="del" id="delBtn">刪除此記錄</button>
-</div>
+
+<div class="hrow"><span>日期</span><span>類別</span><span>金額</span><span>備註</span><span></span></div>
+<div id="rl"><div style="text-align:center;padding:20px;color:#888">尚無記錄</div></div>
+
 <script>
-var R=JSON.parse(localStorage.getItem('lb')||'[]');
-var fm='全部',fc='全部',eid=null;
+var R = JSON.parse(localStorage.getItem('lb') || '[]');
 
-var mc=document.getElementById('mc');
-['全部','1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'].forEach(function(m){
-  var b=document.createElement('button');
-  b.className='chip'+(m==='全部'?' on':'');
-  b.textContent=m;
-  b.setAttribute('data-m',m);
-  mc.appendChild(b);
-});
+document.getElementById('idate').value = new Date().toISOString().slice(0,10);
 
-mc.addEventListener('click',function(e){
-  var b=e.target.closest('button');
-  if(!b)return;
-  fm=b.getAttribute('data-m');
-  mc.querySelectorAll('button').forEach(function(x){x.classList.remove('on')});
-  b.classList.add('on');
-  render();
-});
-
-document.getElementById('cc').addEventListener('click',function(e){
-  var b=e.target.closest('button');
-  if(!b)return;
-  fc=b.getAttribute('data-c');
-  document.getElementById('cc').querySelectorAll('button').forEach(function(x){x.classList.remove('on')});
-  b.classList.add('on');
-  render();
-});
-
-document.getElementById('sq').addEventListener('input',render);
-
-function fmt(n){return'$'+Number(n).toLocaleString()}
+function fmt(n){ return '$' + Number(n).toLocaleString(); }
 
 function render(){
-  var q=document.getElementById('sq').value.toLowerCase();
-  var base=R.filter(function(r){return fm==='全部'||new Date(r.d).getMonth()+1===parseInt(fm)});
-  var f=base.filter(function(r){return(fc==='全部'||r.c===fc)&&(!q||r.n.toLowerCase().includes(q))});
-  document.getElementById('st').textContent=fmt(base.reduce(function(s,r){return s+r.a},0));
-  document.getElementById('so').textContent=fmt(base.filter(function(r){return r.c==='網路'}).reduce(function(s,r){return s+r.a},0));
-  document.getElementById('ss').textContent=fmt(base.filter(function(r){return r.c==='實體'}).reduce(function(s,r){return s+r.a},0));
-  document.getElementById('se').textContent=fmt(base.filter(function(r){return r.c==='東區'}).reduce(function(s,r){return s+r.a},0));
-  document.getElementById('rc').textContent=f.length+' 筆記錄';
-  var rl=document.getElementById('rl');
-  if(!f.length){rl.innerHTML='<div class="empty">沒有符合的記錄</div>';return}
-  f.sort(function(a,b){return b.d.localeCompare(a.d)});
-  rl.innerHTML=f.map(function(r){return'<div class="ri" data-id="'+r.id+'"><span>'+r.d.slice(5)+'</span><span>'+r.c+'</span><span>'+fmt(r.a)+'</span><span style="color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+( r.n||'—')+'</span></div>'}).join('');
-  rl.querySelectorAll('.ri').forEach(function(el){el.addEventListener('click',function(){openEdit(el.getAttribute('data-id'))})});
+  var total = R.reduce(function(s,r){ return s+r.a; }, 0);
+  var online = R.filter(function(r){ return r.c==='網路'; }).reduce(function(s,r){ return s+r.a; }, 0);
+  var store = R.filter(function(r){ return r.c==='實體'; }).reduce(function(s,r){ return s+r.a; }, 0);
+  var east = R.filter(function(r){ return r.c==='東區'; }).reduce(function(s,r){ return s+r.a; }, 0);
+  document.getElementById('st').textContent = fmt(total);
+  document.getElementById('so').textContent = fmt(online);
+  document.getElementById('ss').textContent = fmt(store);
+  document.getElementById('se').textContent = fmt(east);
+  var rl = document.getElementById('rl');
+  if(R.length === 0){
+    rl.innerHTML = '<div style="text-align:center;padding:20px;color:#888">尚無記錄</div>';
+    return;
+  }
+  var sorted = R.slice().sort(function(a,b){ return b.d.localeCompare(a.d); });
+  rl.innerHTML = sorted.map(function(r){
+    return '<div class="row"><span>'+r.d.slice(5)+'</span><span>'+r.c+'</span><span>'+fmt(r.a)+'</span><span style="color:#888;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">'+(r.n||'—')+'</span><button class="x" onclick="del(\''+r.id+'\')">×</button></div>';
+  }).join('');
 }
 
-function openDrawer(){document.getElementById('ov').style.display='block';document.getElementById('dw').style.display='block'}
-function closeDrawer(){document.getElementById('ov').style.display='none';document.getElementById('dw').style.display='none'}
+document.getElementById('savebtn').onclick = function(){
+  var d = document.getElementById('idate').value;
+  var c = document.getElementById('icat').value;
+  var a = parseFloat(document.getElementById('iamt').value) || 0;
+  var n = document.getElementById('inote').value;
+  if(!d){ alert('請填寫日期'); return; }
+  R.push({ id: Date.now().toString(), d:d, c:c, a:a, n:n });
+  localStorage.setItem('lb', JSON.stringify(R));
+  document.getElementById('iamt').value = '';
+  document.getElementById('inote').value = '';
+  render();
+};
 
-document.getElementById('addBtn').addEventListener('click',function(){
-  eid=null;
-  document.getElementById('dt').textContent='新增記錄';
-  document.getElementById('id').value=new Date().toISOString().slice(0,10);
-  document.getElementById('ic').value='網路';
-  document.getElementById('ia').value='';
-  document.getElementById('in').value='';
-  document.getElementById('delBtn').style.display='none';
-  openDrawer();
-});
-
-function openEdit(id){
-  eid=id;
-  var r=R.find(function(r){return r.id===id});
-  document.getElementById('dt').textContent='編輯記錄';
-  document.getElementById('id').value=r.d;
-  document.getElementById('ic').value=r.c;
-  document.getElementById('ia').value=r.a;
-  document.getElementById('in').value=r.n;
-  document.getElementById('delBtn').style.display='block';
-  openDrawer();
+function del(id){
+  if(!confirm('確定刪除？')) return;
+  R = R.filter(function(r){ return r.id !== id; });
+  localStorage.setItem('lb', JSON.stringify(R));
+  render();
 }
-
-document.getElementById('cancelBtn').addEventListener('click',closeDrawer);
-document.getElementById('ov').addEventListener('click',closeDrawer);
-
-document.getElementById('saveBtn').addEventListener('click',function(){
-  var d=document.getElementById('id').value;
-  var c=document.getElementById('ic').value;
-  var a=parseFloat(document.getElementById('ia').value)||0;
-  var n=document.getElementById('in').value;
-  if(!d){alert('請填寫日期');return}
-  if(eid){var r=R.find(function(r){return r.id===eid});r.d=d;r.c=c;r.a=a;r.n=n}
-  else{R.push({id:Date.now().toString(),d:d,c:c,a:a,n:n})}
-  localStorage.setItem('lb',JSON.stringify(R));
-  closeDrawer();render();
-});
-
-document.getElementById('delBtn').addEventListener('click',function(){
-  if(!confirm('確定要刪除？'))return;
-  R=R.filter(function(r){return r.id!==eid});
-  localStorage.setItem('lb',JSON.stringify(R));
-  closeDrawer();render();
-});
 
 render();
 </script>
 </body>
 </html>
-
-
-                                                                                                                                       
-
