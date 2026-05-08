@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LEEBOX STUDIO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Noto+Sans+TC:wght@300;400&family=Didact+Gothic&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0e0e0e;
+    --white: #f8f6f2;
+    --warm: #e8e2d9;
+    --accent: #b8a99a;
+    --mid: #6b6259;
+    --light: #d4cdc6;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--white); color: var(--black); font-family: 'Noto Sans TC', sans-serif; font-weight: 300; cursor: none; }
+  .cursor { width: 8px; height: 8px; background: var(--black); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9999; transition: transform 0.15s ease; transform: translate(-50%, -50%); }
+  .cursor-ring { width: 32px; height: 32px; border: 1px solid var(--black); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9998; transition: transform 0.35s ease, width 0.2s, height 0.2s; transform: translate(-50%, -50%); opacity: 0.5; }
+  .cursor-ring.expand { width: 48px; height: 48px; opacity: 0.25; }
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 20px 48px; background: rgba(248,246,242,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid transparent; transition: border-color 0.4s; }
+  nav.scrolled { border-color: var(--light); }
+  .nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 18px; letter-spacing: 0.22em; font-weight: 300; text-decoration: none; color: var(--black); }
+  .nav-links { display: flex; gap: 36px; list-style: none; }
+  .nav-links a { font-family: 'Didact Gothic', sans-serif; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; text-decoration: none; color: var(--mid); transition: color 0.2s; }
+  .nav-links a:hover { color: var(--black); }
+  .nav-cart { position: relative; background: none; border: none; cursor: none; font-family: 'Didact Gothic', sans-serif; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--mid); transition: color 0.2s; display: flex; align-items: center; gap: 8px; }
+  .nav-cart:hover { color: var(--black); }
+  .cart-count { background: var(--black); color: var(--white); width: 18px; height: 18px; border-radius: 50%; font-size: 10px; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; }
+  .cart-count.show { opacity: 1; }
+  .hero { min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; padding-top: 80px; }
+  .hero-left { display: flex; flex-direction: column; justify-content: center; padding: 80px 48px 80px 80px; }
+  .hero-eyebrow { font-family: 'Didact Gothic', sans-serif; font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--accent); margin-bottom: 24px; opacity: 0; animation: fadeUp 0.8s 0.2s forwards; }
+  .hero-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(52px, 6vw, 88px); font-weight: 300; line-height: 1.08; letter-spacing: 0.02em; margin-bottom: 28px; opacity: 0; animation: fadeUp 0.8s 0.4s forwards; }
+  .hero-title em { font-style: italic; color: var(--accent); }
+  .hero-sub { font-size: 13px; line-height: 1.9; color: var(--mid); max-width: 340px; margin-bottom: 48px; opacity: 0; animation: fadeUp 0.8s 0.6s forwards; }
+  .hero-cta { display: flex; gap: 20px; align-items: center; opacity: 0; animation: fadeUp 0.8s 0.8s forwards; }
+  .btn-primary { background: var(--black); color: var(--white); border: none; padding: 14px 36px; font-family: 'Didact Gothic', sans-serif; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; cursor: none; transition: background 0.25s, transform 0.2s; text-decoration: none; }
+  .btn-primary:hover { background: var(--mid); transform: translateY(-1px); }
+  .btn-ghost { background: none; border: none; font-family: 'Didact Gothic', sans-serif; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--mid); cursor: none; text-decoration: underline; text-underline-offset: 4px; transition: color 0.2s; }
+  .btn-ghost:hover { color: var(--black); }
+  .hero-right { position: relative; overflow: hidden; opacity: 0; animation: fadeIn 1.2s 0.3s forwards; }
+  .hero-visual { width: 100%; height: 100%; background: var(--warm); display: flex; align-items: center; justify-content: center; position: relative; }
+  .hero-illustration { width: 70%; max-width: 380px; opacity: 0.85; }
+  .hero-tag { position: absolute; bottom: 48px; left: -20px; background: var(--white); padding: 16px 24px; border-left: 2px solid var(--black); box-shadow: 0 8px 32px rgba(0,0,0,0.08); }
+  .hero-tag p { font-family: 'Didact Gothic', sans-serif; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--mid); }
+  .hero-tag strong { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 300; display: block; margin-top: 2px; }
+  .marquee-wrap { overflow: hidden; background: var(--black); padding: 14px 0; }
+  .marquee-track { display: flex; gap: 0; animation: marquee 22s linear infinite; white-space: nowrap; }
+  .marquee-item { font-family: 'Cormorant Garamond', serif; font-size: 15px; font-style: italic; color: var(--warm); letter-spacing: 0.1em; padding: 0 40px; }
+  .marquee-dot { color: var(--accent); padding: 0 4px; }
+  section { padding: 100px 80px; }
+  .section-label { font-family: 'Didact Gothic', sans-serif; font-size: 10px; letter-spacing: 0.35em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; }
+  .section-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(36px, 4vw, 56px); font-weight: 300; line-height: 1.1; margin-bottom: 52px; }
+  #products { background: var(--white); }
+  .product-filter { display: flex; gap: 4px; margin-bottom: 48px; }
+  .filter-btn { background: none; border: 1px solid transparent; padding: 8px 20px; font-family: 'Didact Gothic', sans-serif; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--mid); cursor: none; transition: all 0.2s; }
+  .filter-btn:hover, .filter-btn.active { border-color: var(--black); color: var(--black); }
+  .product-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; }
+  .product-card { position: relative; background: var(--warm); overflow: hidden; cursor: none; }
+  .product-card:nth-child(3n+1) { background: var(--warm); }
+  .product-card:nth-child(3n+2) { background: #ede8e0; }
+  .product-card:nth-child(3n+3) { background: #e2dbd1; }
+  .product-img { aspect-ratio: 3/4; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
+  .product-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+  .product-overlay { position: absolute; inset: 0; background: rgba(14,14,14,0); display: flex; align-items: flex-end; padding: 20px; transition: background 0.3s; }
+  .product-card:hover .product-overlay { background: rgba(14,14,14,0.35); }
+  .product-add { background: var(--white); color: var(--black); border: none; width: 100%; padding: 12px; font-family: 'Didact Gothic', sans-serif; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; cursor: none; opacity: 0; transform: translateY(8px); transition: opacity 0.2s, transform 0.2s; }
+  .product-card:hover .product-add { opacity: 1; transform: translateY(0); }
+  .product-info { padding: 16px 16px 20px; }
+  .product-name { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 300; margin-bottom: 4px; letter-spacing: 0.03em; }
+  .product-sub { font-size: 11px; color: var(--mid); letter-spacing: 0.05em; margin-bottom: 8px; }
+  .product-price { font-family: 'Didact Gothic', sans-serif; font-size: 12px; letter-spacing: 0.1em; }
+  .product-tag { position: absolute; top: 14px; left: 14px; background: var(--black); color: var(--white); font-family: 'Didact Gothic', sans-serif; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; padding: 4px 10px; }
+  #about { background: var(--black); color: var(--white); display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; padding: 100px 80px; }
+  #about .section-label { color: var(--accent); }
+  #about .section-title { color: var(--white); margin-bottom: 28px; }
+  .about-text { font-size: 14px; line-height: 2; color: rgba(248,246,242,0.65); margin-bottom: 20px; }
+  .about-stats { display: flex; gap: 48px; margin-top: 48px; padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.1); }
+  .stat-num { font-family: 'Cormorant Garamond', serif; font-size: 42px; font-weight: 300; line-height: 1; color: var(--white); }
+  .stat-label { font-family: 'Didact Gothic', sans-serif; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-top: 6px; }
+  .about-visual { position: relative; height: 500px; background: rgba(255,255,255,0.04); display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.08); }
+  .about-grid-lines { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 40px 40px; }
+  #instagram { padding: 100px 80px; text-align: center; }
+  #instagram .section-title { margin-bottom: 12px; }
+  .ig-handle { font-family: 'Didact Gothic', sans-serif; font-size: 12px; letter-spacing: 0.2em; color: var(--mid); margin-bottom: 52px; }
+  .ig-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; margin-bottom: 48px; }
+  .ig-cell { aspect-ratio: 1; background: var(--warm); overflow: hidden; position: relative; cursor: none; }
+  .ig-cell:nth-child(2n) { background: #ede8e0; }
+  .ig-cell:nth-child(3n) { background: #e0d9d0; }
+  .ig-overlay { position: absolute; inset: 0; background: rgba(14,14,14,0); display: flex; align-items: center; justify-content: center; transition: background 0.3s; }
+  .ig-cell:hover .ig-overlay { background: rgba(14,14,14,0.5); }
+  .ig-icon { opacity: 0; color: white; font-size: 22px; transition: opacity 0.2s; }
+  .ig-cell:hover .ig-icon { opacity: 1; }
+  .btn-outline { border: 1px solid var(--black); background: none; padding: 14px 40px; font-family: 'Didact Gothic', sans-serif; font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase; cursor: none; text-decoration: none; color: var(--black); display: inline-block; transition: background 0.25s, color 0.25s; }
+  .btn-outline:hover { background: var(--black); color: var(--white); }
+  .cart-backdrop { position: fixed; inset: 0; background: rgba(14,14,14,0.4); z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+  .cart-backdrop.open { opacity: 1; pointer-events: all; }
+  .cart-drawer { position: fixed; top: 0; right: 0; bottom: 0; width: 400px; background: var(--white); z-index: 201; transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1); display: flex; flex-direction: column; border-left: 1px solid var(--light); }
+  .cart-drawer.open { transform: translateX(0); }
+  .cart-header { padding: 24px 32px; border-bottom: 1px solid var(--light); display: flex; align-items: center; justify-content: space-between; }
+  .cart-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 300; letter-spacing: 0.05em; }
+  .cart-close { background: none; border: none; cursor: none; font-size: 22px; color: var(--mid); line-height: 1; }
+  .cart-items { flex: 1; overflow-y: auto; padding: 24px 32px; }
+  .cart-empty { text-align: center; padding: 60px 0; color: var(--mid); }
+  .cart-empty-icon { font-size: 36px; margin-bottom: 12px; display: block; }
+  .cart-empty p { font-size: 13px; letter-spacing: 0.05em; }
+  .cart-item { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--light); }
+  .cart-item-img { width: 72px; height: 90px; background: var(--warm); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+  .cart-item-info { flex: 1; }
+  .cart-item-name { font-family: 'Cormorant Garamond', serif; font-size: 16px; font-weight: 300; margin-bottom: 4px; }
+  .cart-item-variant { font-size: 11px; color: var(--mid); letter-spacing: 0.05em; margin-bottom: 8px; }
+  .cart-item-price { font-family: 'Didact Gothic', sans-serif; font-size: 13px; }
+  .cart-item-remove { background: none; border: none; cursor: none; color: var(--light); font-size: 18px; line-height: 1; transition: color 0.2s; align-self: flex-start; }
+  .cart-item-remove:hover { color: var(--mid); }
+  .cart-footer { padding: 24px 32px; border-top: 1px solid var(--light); }
+  .cart-total { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 20px; }
+  .cart-total-label { font-family: 'Didact Gothic', sans-serif; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--mid); }
+  .cart-total-price { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 300; }
+  .btn-checkout { width: 100%; background: var(--black); color: var(--white); border: none; padding: 16px; font-family: 'Didact Gothic', sans-serif; font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase; cursor: none; transition: background 0.25s; }
+  .btn-checkout:hover { background: var(--mid); }
+  .toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--black); color: var(--white); padding: 14px 28px; font-family: 'Didact Gothic', sans-serif; font-size: 11px; letter-spacing: 0.15em; opacity: 0; transition: opacity 0.3s, transform 0.3s; pointer-events: none; z-index: 999; white-space: nowrap; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  footer { background: var(--black); color: var(--white); padding: 60px 80px 40px; }
+  .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 60px; margin-bottom: 60px; }
+  .footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 20px; letter-spacing: 0.2em; font-weight: 300; margin-bottom: 16px; }
+  .footer-tagline { font-size: 12px; color: rgba(248,246,242,0.45); line-height: 1.8; max-width: 220px; }
+  .footer-heading { font-family: 'Didact Gothic', sans-serif; font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--accent); margin-bottom: 20px; }
+  .footer-links { list-style: none; }
+  .footer-links li { margin-bottom: 10px; }
+  .footer-links a { font-size: 13px; color: rgba(248,246,242,0.55); text-decoration: none; transition: color 0.2s; letter-spacing: 0.03em; }
+  .footer-links a:hover { color: var(--white); }
+  .footer-bottom { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 32px; display: flex; justify-content: space-between; align-items: center; }
+  .footer-copy { font-size: 11px; color: rgba(248,246,242,0.3); letter-spacing: 0.05em; }
+  .footer-ig { font-family: 'Didact Gothic', sans-serif; font-size: 10px; letter-spacing: 0.2em; color: var(--accent); text-decoration: none; text-transform: uppercase; transition: color 0.2s; }
+  .footer-ig:hover { color: var(--white); }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  .reveal { opacity: 0; transform: translateY(32px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  @media (max-width: 900px) {
+    nav { padding: 16px 24px; }
+    .nav-links { display: none; }
+    section { padding: 64px 24px; }
+    .hero { grid-template-columns: 1fr; }
+    .hero-left { padding: 60px 24px 40px; }
+    .hero-right { min-height: 50vw; }
+    .product-grid { grid-template-columns: repeat(2, 1fr); }
+    #about { grid-template-columns: 1fr; padding: 64px 24px; }
+    .about-visual { height: 280px; }
+    #instagram { padding: 64px 24px; }
+    .ig-grid { grid-template-columns: repeat(3, 1fr); }
+    .footer-grid { grid-template-columns: 1fr 1fr; padding: 0; }
+    footer { padding: 48px 24px 32px; }
+    .cart-drawer { width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<nav id="navbar">
+  <a href="#" class="nav-logo">LEEBOX STUDIO</a>
+  <ul class="nav-links">
+    <li><a href="#products">Collection</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#instagram">Instagram</a></li>
+  </ul>
+  <button class="nav-cart" id="cartBtn">Cart <span class="cart-count" id="cartCount">0</span></button>
+</nav>
+<section class="hero">
+  <div class="hero-left">
+    <p class="hero-eyebrow">2019 — Taichung Studio</p>
+    <h1 class="hero-title">Wear What<br>You <em>Feel</em></h1>
+    <p class="hero-sub">精緻飾品，為日常帶來一份獨特的存在感。每一件作品，都是你個性的延伸。</p>
+    <div class="hero-cta">
+      <a href="#products" class="btn-primary">Shop Now</a>
+      <a href="#about" class="btn-ghost">Our Story</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-visual">
+      <svg class="hero-illustration" viewBox="0 0 400 480" fill="none">
+        <ellipse cx="200" cy="180" rx="140" ry="90" stroke="#b8a99a" stroke-width="1.5" fill="none" stroke-dasharray="4 3"/>
+        <rect x="182" y="262" width="36" height="36" rx="3" stroke="#6b6259" stroke-width="1.5" fill="none" transform="rotate(45 200 280)"/>
+        <circle cx="200" cy="280" r="8" fill="#b8a99a" opacity="0.5"/>
+        <circle cx="120" cy="380" r="34" stroke="#b8a99a" stroke-width="2" fill="none"/>
+        <circle cx="120" cy="380" r="22" stroke="#6b6259" stroke-width="1" fill="none"/>
+        <circle cx="310" cy="130" r="6" fill="#6b6259"/>
+        <line x1="310" y1="136" x2="310" y2="170" stroke="#6b6259" stroke-width="1.5"/>
+        <ellipse cx="310" cy="182" rx="10" ry="14" stroke="#6b6259" stroke-width="1.5" fill="none"/>
+        <path d="M 60 290 Q 90 260 140 270 Q 170 278 175 300 Q 170 322 140 330 Q 90 340 60 310 Q 45 300 60 290Z" stroke="#b8a99a" stroke-width="1.5" fill="none"/>
+        <circle cx="100" cy="295" r="4" fill="#b8a99a" opacity="0.6"/>
+        <circle cx="130" cy="288" r="3" fill="#b8a99a" opacity="0.6"/>
+        <circle cx="280" cy="360" r="3" fill="#d4cdc6"/>
+        <circle cx="300" cy="380" r="2" fill="#d4cdc6"/>
+        <circle cx="260" cy="390" r="2" fill="#d4cdc6"/>
+        <circle cx="340" cy="340" r="4" fill="#d4cdc6" opacity="0.6"/>
+        <line x1="340" y1="230" x2="340" y2="270" stroke="#6b6259" stroke-width="2"/>
+        <line x1="328" y1="248" x2="352" y2="248" stroke="#6b6259" stroke-width="2"/>
+        <circle cx="340" cy="222" r="5" fill="#6b6259"/>
+      </svg>
+      <div class="hero-tag"><p>New Arrival</p><strong>2025 Collection</strong></div>
+    </div>
+  </div>
+</section>
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span class="marquee-item">RINGS</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">NECKLACES</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">BRACELETS</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">EARRINGS</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">LEEBOX STUDIO</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">台中選物</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">RINGS</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">NECKLACES</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">BRACELETS</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">EARRINGS</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">LEEBOX STUDIO</span><span class="marquee-dot">·</span>
+    <span class="marquee-item">台中選物</span><span class="marquee-dot">·</span>
+  </div>
+</div>
+<section id="products">
+  <div class="reveal">
+    <p class="section-label">Collection 2025</p>
+    <h2 class="section-title">精選飾品</h2>
+  </div>
+  <div class="product-filter reveal">
+    <button class="filter-btn active" onclick="filterProducts('all', this)">All</button>
+    <button class="filter-btn" onclick="filterProducts('ring', this)">Rings</button>
+    <button class="filter-btn" onclick="filterProducts('necklace', this)">Necklaces</button>
+    <button class="filter-btn" onclick="filterProducts('bracelet', this)">Bracelets</button>
+    <button class="filter-btn" onclick="filterProducts('earring', this)">Earrings</button>
+  </div>
+  <div class="product-grid" id="productGrid"></div>
+</section>
+<section id="about">
+  <div class="reveal">
+    <p class="section-label">Our Story</p>
+    <h2 class="section-title">關於<br>Leebox</h2>
+    <p class="about-text">成立於 2019 年，Leebox Studio 源於台中，以「讓配件說話」為核心理念，挑選每一件能為日常穿搭帶來層次感的飾品。</p>
+    <p class="about-text">我們橫跨暗黑哥德與韓系簡約兩種美學，相信配件不只是裝飾，而是個人風格最真實的表達。</p>
+    <div class="about-stats">
+      <div><div class="stat-num">6+</div><div class="stat-label">Years</div></div>
+      <div><div class="stat-num">5</div><div class="stat-label">Locations</div></div>
+      <div><div class="stat-num">200+</div><div class="stat-label">Products</div></div>
+    </div>
+  </div>
+  <div class="about-visual reveal">
+    <div class="about-grid-lines"></div>
+    <svg width="240" height="240" viewBox="0 0 240 240" fill="none">
+      <circle cx="120" cy="120" r="80" stroke="rgba(184,169,154,0.3)" stroke-width="1"/>
+      <circle cx="120" cy="120" r="55" stroke="rgba(184,169,154,0.2)" stroke-width="1"/>
+      <circle cx="120" cy="120" r="30" stroke="rgba(184,169,154,0.4)" stroke-width="1.5"/>
+      <circle cx="120" cy="120" r="8" fill="rgba(184,169,154,0.6)"/>
+      <line x1="120" y1="40" x2="120" y2="200" stroke="rgba(184,169,154,0.15)" stroke-width="1"/>
+      <line x1="40" y1="120" x2="200" y2="120" stroke="rgba(184,169,154,0.15)" stroke-width="1"/>
+      <text x="120" y="200" text-anchor="middle" font-family="Cormorant Garamond, serif" font-size="11" fill="rgba(184,169,154,0.5)" letter-spacing="4">STUDIO</text>
+    </svg>
+  </div>
+</section>
+<section id="instagram">
+  <div class="reveal">
+    <p class="section-label">Follow Us</p>
+    <h2 class="section-title">Instagram</h2>
+    <p class="ig-handle">@leeboxstudio</p>
+  </div>
+  <div class="ig-grid reveal" id="igGrid"></div>
+  <a href="https://instagram.com/leeboxstudio" target="_blank" class="btn-outline reveal">Follow @leeboxstudio</a>
+</section>
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-logo">LEEBOX STUDIO</div>
+      <p class="footer-tagline">台中飾品選物。讓每件配件，成為你最好的表達。</p>
+    </div>
+    <div>
+      <p class="footer-heading">Shop</p>
+      <ul class="footer-links">
+        <li><a href="#products">All Products</a></li>
+        <li><a href="#">Rings</a></li>
+        <li><a href="#">Necklaces</a></li>
+        <li><a href="#">Bracelets</a></li>
+        <li><a href="#">Earrings</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="footer-heading">Info</p>
+      <ul class="footer-links">
+        <li><a href="#about">About Us</a></li>
+        <li><a href="#">Shipping Policy</a></li>
+        <li><a href="#">Return Policy</a></li>
+        <li><a href="#">Size Guide</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="footer-heading">Contact</p>
+      <ul class="footer-links">
+        <li><a href="https://instagram.com/leeboxstudio" target="_blank">Instagram</a></li>
+        <li><a href="#">Line</a></li>
+        <li><a href="#">Email</a></li>
+        <li><a href="#">台中門市</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-copy">© 2025 Leebox Studio. All rights reserved.</p>
+    <a href="https://instagram.com/leeboxstudio" class="footer-ig" target="_blank">@leeboxstudio</a>
+  </div>
+</footer>
+<div class="cart-backdrop" id="cartBackdrop"></div>
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-header">
+    <span class="cart-title">Your Cart</span>
+    <button class="cart-close" id="cartClose">×</button>
+  </div>
+  <div class="cart-items" id="cartItems"></div>
+  <div class="cart-footer" id="cartFooter" style="display:none">
+    <div class="cart-total">
+      <span class="cart-total-label">Total</span>
+      <span class="cart-total-price" id="cartTotal">NT$ 0</span>
+    </div>
+    <button class="btn-checkout">Checkout</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+let mx = 0, my = 0, rx = 0, ry = 0;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+function animateCursor() {
+  cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+  rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+  ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+  requestAnimationFrame(animateCursor);
+}
+animateCursor();
+document.querySelectorAll('a, button, .product-card, .ig-cell').forEach(el => {
+  el.addEventListener('mouseenter', () => ring.classList.add('expand'));
+  el.addEventListener('mouseleave', () => ring.classList.remove('expand'));
+});
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 60);
+});
+const products = [
+  { id:1, name:'Silver Arc Ring', sub:'銀色弧形戒', price:680, tag:'New', cat:'ring', emoji:'💍' },
+  { id:2, name:'Chain Link Necklace', sub:'鏈條頸鏈', price:980, tag:'Hot', cat:'necklace', emoji:'📿' },
+  { id:3, name:'Stone Bangle', sub:'天然石手環', price:850, tag:'', cat:'bracelet', emoji:'🪬' },
+  { id:4, name:'Hoop Earrings', sub:'圓形耳環', price:520, tag:'New', cat:'earring', emoji:'✨' },
+  { id:5, name:'Cross Pendant', sub:'十字墜鏈', price:1200, tag:'', cat:'necklace', emoji:'🔮' },
+  { id:6, name:'Twist Band Ring', sub:'扭紋戒指', price:750, tag:'Hot', cat:'ring', emoji:'💫' },
+  { id:7, name:'Pearl Drop Earring', sub:'珍珠垂墜耳環', price:680, tag:'', cat:'earring', emoji:'🌸' },
+  { id:8, name:'Cuff Bracelet', sub:'寬版手環', price:920, tag:'New', cat:'bracelet', emoji:'⚡' },
+];
+let cart = [];
+function renderProducts(filter) {
+  const grid = document.getElementById('productGrid');
+  const filtered = filter === 'all' ? products : products.filter(p => p.cat === filter);
+  grid.innerHTML = filtered.map(p => `
+    <div class="product-card" data-id="${p.id}">
+      ${p.tag ? `<div class="product-tag">${p.tag}</div>` : ''}
+      <div class="product-img">
+        <div class="product-placeholder">
+          <svg width="100" height="120" viewBox="0 0 100 120" fill="none">
+            <text x="50" y="65" text-anchor="middle" font-size="42">${p.emoji}</text>
+            <text x="50" y="100" text-anchor="middle" font-family="Didact Gothic,sans-serif" font-size="8" fill="#b8a99a" letter-spacing="2">${p.cat.toUpperCase()}</text>
+          </svg>
+        </div>
+        <div class="product-overlay">
+          <button class="product-add" onclick="addToCart(${p.id})">Add to Cart</button>
+        </div>
+      </div>
+      <div class="product-info">
+        <div class="product-name">${p.name}</div>
+        <div class="product-sub">${p.sub}</div>
+        <div class="product-price">NT$ ${p.price.toLocaleString()}</div>
+      </div>
+    </div>
+  `).join('');
+}
+function filterProducts(cat, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderProducts(cat);
+}
+function addToCart(id) {
+  const p = products.find(x => x.id === id);
+  const existing = cart.find(x => x.id === id);
+  if (existing) existing.qty++;
+  else cart.push({ ...p, qty: 1 });
+  updateCart();
+  showToast(`${p.name} 已加入購物車`);
+}
+function removeFromCart(id) {
+  cart = cart.filter(x => x.id !== id);
+  updateCart();
+}
+function updateCart() {
+  const total = cart.reduce((s, x) => s + x.price * x.qty, 0);
+  const count = cart.reduce((s, x) => s + x.qty, 0);
+  const countEl = document.getElementById('cartCount');
+  countEl.textContent = count;
+  countEl.classList.toggle('show', count > 0);
+  document.getElementById('cartTotal').textContent = `NT$ ${total.toLocaleString()}`;
+  document.getElementById('cartFooter').style.display = cart.length ? 'block' : 'none';
+  const itemsEl = document.getElementById('cartItems');
+  if (cart.length === 0) {
+    itemsEl.innerHTML = `<div class="cart-empty"><span class="cart-empty-icon">🛍</span><p>Your cart is empty</p></div>`;
+  } else {
+    itemsEl.innerHTML = cart.map(item => `
+      <div class="cart-item">
+        <div class="cart-item-img">${item.emoji}</div>
+        <div class="cart-item-info">
+          <div class="cart-item-name">${item.name}</div>
+          <div class="cart-item-variant">${item.sub} × ${item.qty}</div>
+          <div class="cart-item-price">NT$ ${(item.price * item.qty).toLocaleString()}</div>
+        </div>
+        <button class="cart-item-remove" onclick="removeFromCart(${item.id})">×</button>
+      </div>
+    `).join('');
+  }
+}
+function openCart() {
+  document.getElementById('cartDrawer').classList.add('open');
+  document.getElementById('cartBackdrop').classList.add('open');
+}
+function closeCart() {
+  document.getElementById('cartDrawer').classList.remove('open');
+  document.getElementById('cartBackdrop').classList.remove('open');
+}
+document.getElementById('cartBtn').addEventListener('click', openCart);
+document.getElementById('cartClose').addEventListener('click', closeCart);
+document.getElementById('cartBackdrop').addEventListener('click', closeCart);
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+function renderIG() {
+  const emojis = ['📿','💍','✨','🌸','🔮','💫','⚡','🪬','🌙','🖤','⭐','🌺'];
+  document.getElementById('igGrid').innerHTML = emojis.map(e => `
+    <div class="ig-cell">
+      <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:2em">${e}</div>
+      <div class="ig-overlay"><span class="ig-icon">♡</span></div>
+    </div>
+  `).join('');
+}
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+renderProducts('all');
+renderIG();
+updateCart();
+</script>
+</body>
+</html>
